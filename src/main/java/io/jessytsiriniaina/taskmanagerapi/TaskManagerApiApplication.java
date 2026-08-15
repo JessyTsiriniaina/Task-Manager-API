@@ -9,7 +9,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
         info = @Info(
                 title = "Task Manager API",
                 version = "1.0",
-                description = "API documentation for task manager"
+                description = "Documentation for Task API Manager"
         )
 )
 
