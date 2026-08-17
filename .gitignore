@@ -1,6 +1,7 @@
 HELP.md
 DIRECTIVE.md
 .env
+TODO.md
 target/
 .mvn/wrapper/maven-wrapper.jar
 !**/src/main/**/target/
