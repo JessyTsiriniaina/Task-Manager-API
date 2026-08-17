@@ -2,6 +2,7 @@ package io.jessytsiriniaina.taskmanagerapi.entity;
 
 import io.jessytsiriniaina.taskmanagerapi.enums.TaskPriority;
 import io.jessytsiriniaina.taskmanagerapi.enums.TaskStatus;
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
@@ -36,6 +37,7 @@ public class Task {
     @FutureOrPresent(message = "Task due date must be a future or the present date")
     private LocalDateTime dueDate;
 
+    @Column(updatable = false)
     @NotNull(message = "Task creation date is required")
     private LocalDateTime createdAt;
 
