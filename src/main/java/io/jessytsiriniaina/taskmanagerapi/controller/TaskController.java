@@ -1,6 +1,7 @@
 package io.jessytsiriniaina.taskmanagerapi.controller;
 
 import io.jessytsiriniaina.taskmanagerapi.entity.Task;
+import io.jessytsiriniaina.taskmanagerapi.enums.TaskStatus;
 import io.jessytsiriniaina.taskmanagerapi.service.TaskService;
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
@@ -57,5 +58,12 @@ public class TaskController {
             @RequestBody Task updatedTask
     ) {
         return ResponseEntity.ok(taskService.update(id, updatedTask));
+    }
+
+    @GetMapping(params = {"status"})
+    public ResponseEntity<List<Task>> findByStatus(
+            @RequestParam("status") TaskStatus status
+    ) {
+        return ResponseEntity.ok(taskService.findByStatus(status));
     }
 }

@@ -1,6 +1,7 @@
 package io.jessytsiriniaina.taskmanagerapi.service;
 
 import io.jessytsiriniaina.taskmanagerapi.entity.Task;
+import io.jessytsiriniaina.taskmanagerapi.enums.TaskStatus;
 import io.jessytsiriniaina.taskmanagerapi.exception.TaskNotFoundException;
 import io.jessytsiriniaina.taskmanagerapi.repository.TaskRepository;
 import org.springframework.stereotype.Service;
@@ -47,6 +48,10 @@ public class TaskService {
                     return taskRepository.save(existingTask);
                 })
                 .orElseThrow(() -> new TaskNotFoundException(id));
+    }
+
+    public List<Task> findByStatus(TaskStatus status) {
+        return taskRepository.findByStatus(status);
     }
 
 
