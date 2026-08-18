@@ -63,4 +63,8 @@ public class TaskService {
         return taskRepository.findByTitleContainingIgnoreCase(text);
     }
 
+    public List<Task> findByStatusAndPriority(TaskStatus status, TaskPriority priority) {
+        return taskRepository.findByStatusAndPriority(status, priority);
+    }
+
 }
