@@ -3,8 +3,12 @@ package io.jessytsiriniaina.taskmanagerapi.service;
 import io.jessytsiriniaina.taskmanagerapi.entity.Task;
 import io.jessytsiriniaina.taskmanagerapi.enums.TaskPriority;
 import io.jessytsiriniaina.taskmanagerapi.enums.TaskStatus;
+import io.jessytsiriniaina.taskmanagerapi.exception.PaginationParamsInvalidException;
 import io.jessytsiriniaina.taskmanagerapi.exception.TaskNotFoundException;
 import io.jessytsiriniaina.taskmanagerapi.repository.TaskRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -65,6 +69,15 @@ public class TaskService {
 
     public List<Task> findByStatusAndPriority(TaskStatus status, TaskPriority priority) {
         return taskRepository.findByStatusAndPriority(status, priority);
+    }
+
+    public Page<Task> findAll(int page, int size) {
+        if(page< 0 || size < 1)
+            throw new PaginationParamsInvalidException();
+
+        Pageable pageable = PageRequest.of(page, size);
+
+        return taskRepository.findAll(pageable);
     }
 
 }
