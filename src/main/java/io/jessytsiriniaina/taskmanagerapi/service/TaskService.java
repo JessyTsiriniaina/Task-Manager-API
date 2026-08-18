@@ -1,6 +1,7 @@
 package io.jessytsiriniaina.taskmanagerapi.service;
 
 import io.jessytsiriniaina.taskmanagerapi.entity.Task;
+import io.jessytsiriniaina.taskmanagerapi.enums.TaskPriority;
 import io.jessytsiriniaina.taskmanagerapi.enums.TaskStatus;
 import io.jessytsiriniaina.taskmanagerapi.exception.TaskNotFoundException;
 import io.jessytsiriniaina.taskmanagerapi.repository.TaskRepository;
@@ -52,6 +53,10 @@ public class TaskService {
 
     public List<Task> findByStatus(TaskStatus status) {
         return taskRepository.findByStatus(status);
+    }
+
+    public List<Task> findByPriority(TaskPriority priority) {
+        return taskRepository.findByPriority(priority);
     }
 
 

@@ -1,6 +1,7 @@
 package io.jessytsiriniaina.taskmanagerapi.controller;
 
 import io.jessytsiriniaina.taskmanagerapi.entity.Task;
+import io.jessytsiriniaina.taskmanagerapi.enums.TaskPriority;
 import io.jessytsiriniaina.taskmanagerapi.enums.TaskStatus;
 import io.jessytsiriniaina.taskmanagerapi.service.TaskService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -65,5 +66,12 @@ public class TaskController {
             @RequestParam("status") TaskStatus status
     ) {
         return ResponseEntity.ok(taskService.findByStatus(status));
+    }
+
+    @GetMapping(params = {"priority"})
+    public ResponseEntity<List<Task>> findByPriority(
+            @RequestParam("priority") TaskPriority priority
+    ) {
+        return ResponseEntity.ok(taskService.findByPriority(priority));
     }
 }
