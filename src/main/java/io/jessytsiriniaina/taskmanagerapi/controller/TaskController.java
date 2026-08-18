@@ -74,4 +74,12 @@ public class TaskController {
     ) {
         return ResponseEntity.ok(taskService.findByPriority(priority));
     }
+
+    @GetMapping(params = {"title"})
+    public ResponseEntity<List<Task>> findByTitleContainingIgnoreCase(
+            @RequestParam("title") String text
+    ) {
+        return ResponseEntity.ok(taskService.findByTitleContainingIgnoreCase(text));
+    }
+
 }

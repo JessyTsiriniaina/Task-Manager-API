@@ -59,5 +59,8 @@ public class TaskService {
         return taskRepository.findByPriority(priority);
     }
 
+    public List<Task> findByTitleContainingIgnoreCase(String text) {
+        return taskRepository.findByTitleContainingIgnoreCase(text);
+    }
 
 }

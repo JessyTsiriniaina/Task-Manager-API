@@ -12,4 +12,5 @@ import java.util.List;
 public interface TaskRepository extends JpaRepository<Task, Long> {
     public List<Task> findByStatus(TaskStatus status);
     public List<Task> findByPriority(TaskPriority priority);
+    public List<Task> findByTitleContainingIgnoreCase(String text);
 }
