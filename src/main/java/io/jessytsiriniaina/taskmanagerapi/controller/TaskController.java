@@ -6,6 +6,7 @@ import io.jessytsiriniaina.taskmanagerapi.enums.TaskStatus;
 import io.jessytsiriniaina.taskmanagerapi.service.TaskService;
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -88,6 +89,15 @@ public class TaskController {
             @RequestParam("priority") TaskPriority priority
     ) {
         return ResponseEntity.ok(taskService.findByStatusAndPriority(status,priority));
+    }
+
+
+    @GetMapping(params = {"page", "size"})
+    public ResponseEntity<Page<Task>> findAllPaginated(
+            @RequestParam("page") int page,
+            @RequestParam("size") int size
+    ) {
+        return ResponseEntity.ok(taskService.findAll(page, size));
     }
 
 }
