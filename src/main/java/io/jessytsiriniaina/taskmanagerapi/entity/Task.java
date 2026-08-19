@@ -20,7 +20,7 @@ public class Task {
     @GeneratedValue
     private Long id;
 
-    @NotBlank
+    @NotBlank(message = "Task title must not be blank")
     @Size(max = 100, message = "Task title length must be lower than 100")
     private String title;
 

@@ -1,6 +1,8 @@
 package io.jessytsiriniaina.taskmanagerapi.service;
 
 import io.jessytsiriniaina.taskmanagerapi.entity.Task;
+import io.jessytsiriniaina.taskmanagerapi.enums.TaskPriority;
+import io.jessytsiriniaina.taskmanagerapi.enums.TaskStatus;
 import io.jessytsiriniaina.taskmanagerapi.exception.TaskNotFoundException;
 import io.jessytsiriniaina.taskmanagerapi.repository.TaskRepository;
 import org.springframework.stereotype.Service;
@@ -49,5 +51,20 @@ public class TaskService {
                 .orElseThrow(() -> new TaskNotFoundException(id));
     }
 
+    public List<Task> findByStatus(TaskStatus status) {
+        return taskRepository.findByStatus(status);
+    }
+
+    public List<Task> findByPriority(TaskPriority priority) {
+        return taskRepository.findByPriority(priority);
+    }
+
+    public List<Task> findByTitleContainingIgnoreCase(String text) {
+        return taskRepository.findByTitleContainingIgnoreCase(text);
+    }
+
+    public List<Task> findByStatusAndPriority(TaskStatus status, TaskPriority priority) {
+        return taskRepository.findByStatusAndPriority(status, priority);
+    }
 
 }
