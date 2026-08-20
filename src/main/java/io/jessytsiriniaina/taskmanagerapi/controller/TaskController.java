@@ -1,6 +1,7 @@
 package io.jessytsiriniaina.taskmanagerapi.controller;
 
-import io.jessytsiriniaina.taskmanagerapi.entity.Task;
+import io.jessytsiriniaina.taskmanagerapi.dto.TaskRequest;
+import io.jessytsiriniaina.taskmanagerapi.dto.TaskResponse;
 import io.jessytsiriniaina.taskmanagerapi.enums.TaskPriority;
 import io.jessytsiriniaina.taskmanagerapi.enums.TaskStatus;
 import io.jessytsiriniaina.taskmanagerapi.service.TaskService;
@@ -25,16 +26,16 @@ public class TaskController {
 
     @Operation(summary = "Get all tasks")
     @GetMapping
-    public ResponseEntity<List<Task>> findAll() {
+    public ResponseEntity<List<TaskResponse>> findAll() {
         return ResponseEntity.ok(taskService.findAll());
     }
 
     @Operation(summary = "Create a new task")
     @PostMapping
-    public ResponseEntity<Task> save(
-            @Valid @RequestBody Task task
+    public ResponseEntity<TaskResponse> save(
+            @Valid @RequestBody TaskRequest request
     ) {
-        Task created = taskService.save(task);
+        TaskResponse created = taskService.save(request);
         return ResponseEntity
                 .status(HttpStatus.CREATED)
                 .body(created);
@@ -42,7 +43,7 @@ public class TaskController {
 
     @Operation(summary = "Get a task by id")
     @GetMapping("/{id}")
-    public ResponseEntity<Task> findById(@PathVariable("id") Long id) {
+    public ResponseEntity<TaskResponse> findById(@PathVariable("id") Long id) {
         return ResponseEntity.ok(taskService.findById(id));
     }
 
@@ -55,36 +56,36 @@ public class TaskController {
 
     @Operation(summary = "Update a task by id")
     @PutMapping("/{id}")
-    public ResponseEntity<Task> udpate(
+    public ResponseEntity<TaskResponse> udpate(
             @PathVariable("id") Long id,
-            @RequestBody Task updatedTask
+            @RequestBody TaskRequest request
     ) {
-        return ResponseEntity.ok(taskService.update(id, updatedTask));
+        return ResponseEntity.ok(taskService.update(id, request));
     }
 
     @GetMapping(params = {"status"})
-    public ResponseEntity<List<Task>> findByStatus(
+    public ResponseEntity<List<TaskResponse>> findByStatus(
             @RequestParam("status") TaskStatus status
     ) {
         return ResponseEntity.ok(taskService.findByStatus(status));
     }
 
     @GetMapping(params = {"priority"})
-    public ResponseEntity<List<Task>> findByPriority(
+    public ResponseEntity<List<TaskResponse>> findByPriority(
             @RequestParam("priority") TaskPriority priority
     ) {
         return ResponseEntity.ok(taskService.findByPriority(priority));
     }
 
     @GetMapping(params = {"title"})
-    public ResponseEntity<List<Task>> findByTitleContainingIgnoreCase(
+    public ResponseEntity<List<TaskResponse>> findByTitleContainingIgnoreCase(
             @RequestParam("title") String text
     ) {
         return ResponseEntity.ok(taskService.findByTitleContainingIgnoreCase(text));
     }
 
     @GetMapping(params = {"status", "priority"})
-    public ResponseEntity<List<Task>> findByStatusAndPriority(
+    public ResponseEntity<List<TaskResponse>> findByStatusAndPriority(
             @RequestParam("status") TaskStatus status,
             @RequestParam("priority") TaskPriority priority
     ) {
@@ -93,7 +94,7 @@ public class TaskController {
 
 
     @GetMapping(params = {"page", "size"})
-    public ResponseEntity<Page<Task>> findAllPaginated(
+    public ResponseEntity<Page<TaskResponse>> findAllPaginated(
             @RequestParam("page") int page,
             @RequestParam("size") int size
     ) {

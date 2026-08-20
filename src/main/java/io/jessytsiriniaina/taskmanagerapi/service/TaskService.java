@@ -1,10 +1,13 @@
 package io.jessytsiriniaina.taskmanagerapi.service;
 
+import io.jessytsiriniaina.taskmanagerapi.dto.TaskRequest;
+import io.jessytsiriniaina.taskmanagerapi.dto.TaskResponse;
 import io.jessytsiriniaina.taskmanagerapi.entity.Task;
 import io.jessytsiriniaina.taskmanagerapi.enums.TaskPriority;
 import io.jessytsiriniaina.taskmanagerapi.enums.TaskStatus;
 import io.jessytsiriniaina.taskmanagerapi.exception.PaginationParamsInvalidException;
 import io.jessytsiriniaina.taskmanagerapi.exception.TaskNotFoundException;
+import io.jessytsiriniaina.taskmanagerapi.mapper.TaskMapper;
 import io.jessytsiriniaina.taskmanagerapi.repository.TaskRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -17,67 +20,85 @@ import java.util.List;
 public class TaskService {
 
     private final TaskRepository taskRepository;
+    private final TaskMapper taskMapper;
 
-    public TaskService(TaskRepository taskRepository) {
+    public TaskService(TaskRepository taskRepository, TaskMapper taskMapper) {
         this.taskRepository = taskRepository;
+        this.taskMapper = taskMapper;
     }
 
-    public List<Task> findAll() {
-        return taskRepository.findAll();
+    public List<TaskResponse> findAll() {
+        return taskRepository.findAll()
+                .stream()
+                .map(taskMapper::toResponse)
+                .toList();
     }
 
-    public Task save(Task task) {
-        return taskRepository.save(task);
+    public TaskResponse save(TaskRequest request) {
+        Task saved = taskRepository.save(taskMapper.toEntity(request));
+        return taskMapper.toResponse(saved);
     }
 
-    public Task findById(Long id) {
-        return taskRepository.findById(id)
+    public TaskResponse findById(Long id) {
+        Task task = taskRepository.findById(id)
                 .orElseThrow(() -> new TaskNotFoundException(id));
+        return taskMapper.toResponse(task);
     }
 
     public void deleteById(Long id) {
         taskRepository.deleteById(id);
     }
 
-    public Task update(Long id, Task updatedTask) {
+    public TaskResponse update(Long id, TaskRequest request) {
         return taskRepository.findById(id)
                 .map(existingTask -> {
-                    existingTask.setTitle(updatedTask.getTitle());
-                    existingTask.setDescription(updatedTask.getDescription());
-                    existingTask.setStatus(updatedTask.getStatus());
-                    existingTask.setPriority(updatedTask.getPriority());
-                    existingTask.setDueDate(updatedTask.getDueDate());
-                    existingTask.setCreatedAt(updatedTask.getCreatedAt());
-                    existingTask.setUpdatedAt(updatedTask.getUpdatedAt());
+                    existingTask.setTitle(request.title());
+                    existingTask.setDescription(request.description());
+                    existingTask.setStatus(request.status());
+                    existingTask.setPriority(request.priority());
+                    existingTask.setDueDate(request.dueDate());
 
-                    return taskRepository.save(existingTask);
+                    return taskMapper.toResponse(taskRepository.save(existingTask));
                 })
                 .orElseThrow(() -> new TaskNotFoundException(id));
     }
 
-    public List<Task> findByStatus(TaskStatus status) {
-        return taskRepository.findByStatus(status);
+    public List<TaskResponse> findByStatus(TaskStatus status) {
+        return taskRepository.findByStatus(status)
+                .stream()
+                .map(taskMapper::toResponse)
+                .toList();
     }
 
-    public List<Task> findByPriority(TaskPriority priority) {
-        return taskRepository.findByPriority(priority);
+    public List<TaskResponse> findByPriority(TaskPriority priority) {
+        return taskRepository.findByPriority(priority)
+                .stream()
+                .map(taskMapper::toResponse)
+                .toList();
     }
 
-    public List<Task> findByTitleContainingIgnoreCase(String text) {
-        return taskRepository.findByTitleContainingIgnoreCase(text);
+    public List<TaskResponse> findByTitleContainingIgnoreCase(String text) {
+        return taskRepository.findByTitleContainingIgnoreCase(text)
+                .stream()
+                .map(taskMapper::toResponse)
+                .toList();
     }
 
-    public List<Task> findByStatusAndPriority(TaskStatus status, TaskPriority priority) {
-        return taskRepository.findByStatusAndPriority(status, priority);
+    public List<TaskResponse> findByStatusAndPriority(TaskStatus status, TaskPriority priority) {
+        return taskRepository.findByStatusAndPriority(status, priority)
+                .stream()
+                .map(taskMapper::toResponse)
+                .toList();
     }
 
-    public Page<Task> findAll(int page, int size) {
+    public Page<TaskResponse> findAll(int page, int size) {
         if(page< 0 || size < 1)
             throw new PaginationParamsInvalidException();
 
         Pageable pageable = PageRequest.of(page, size);
 
-        return taskRepository.findAll(pageable);
+        return taskRepository.findAll(pageable)
+                .map(taskMapper::toResponse);
     }
 
 }
