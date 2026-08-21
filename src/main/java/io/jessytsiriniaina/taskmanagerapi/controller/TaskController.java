@@ -2,6 +2,7 @@ package io.jessytsiriniaina.taskmanagerapi.controller;
 
 import io.jessytsiriniaina.taskmanagerapi.dto.TaskRequest;
 import io.jessytsiriniaina.taskmanagerapi.dto.TaskResponse;
+import io.jessytsiriniaina.taskmanagerapi.dto.TaskStatusRequest;
 import io.jessytsiriniaina.taskmanagerapi.enums.TaskPriority;
 import io.jessytsiriniaina.taskmanagerapi.enums.TaskStatus;
 import io.jessytsiriniaina.taskmanagerapi.service.TaskService;
@@ -61,6 +62,15 @@ public class TaskController {
             @RequestBody TaskRequest request
     ) {
         return ResponseEntity.ok(taskService.update(id, request));
+    }
+
+    @Operation(summary = "Update a task status by id")
+    @PatchMapping("/{id}")
+    public ResponseEntity<TaskResponse> updateStatus(
+            @PathVariable("id") Long id,
+            @Valid @RequestBody TaskStatusRequest request
+    ) {
+        return ResponseEntity.ok(taskService.updateStatus(id, request.status()));
     }
 
     @GetMapping(params = {"status"})

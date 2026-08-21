@@ -63,6 +63,15 @@ public class TaskService {
                 .orElseThrow(() -> new TaskNotFoundException(id));
     }
 
+    public TaskResponse updateStatus(Long id, TaskStatus status) {
+        return taskRepository.findById(id)
+                .map(existingTask -> {
+                    existingTask.setStatus(status);
+                    return taskMapper.toResponse(taskRepository.save(existingTask));
+                })
+                .orElseThrow(() -> new TaskNotFoundException(id));
+    }
+
     public List<TaskResponse> findByStatus(TaskStatus status) {
         return taskRepository.findByStatus(status)
                 .stream()
