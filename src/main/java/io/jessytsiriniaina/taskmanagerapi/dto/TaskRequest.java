@@ -25,6 +25,9 @@ public record TaskRequest(
 
         @NotNull(message = "Task due date is required")
         @FutureOrPresent(message = "Task due date must be a future or the present date")
-        LocalDateTime dueDate
+        LocalDateTime dueDate,
+
+        @NotNull(message = "Task owner is required")
+        Long userId
 ) {
 }

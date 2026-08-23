@@ -3,12 +3,15 @@ package io.jessytsiriniaina.taskmanagerapi.service;
 import io.jessytsiriniaina.taskmanagerapi.dto.TaskRequest;
 import io.jessytsiriniaina.taskmanagerapi.dto.TaskResponse;
 import io.jessytsiriniaina.taskmanagerapi.entity.Task;
+import io.jessytsiriniaina.taskmanagerapi.entity.User;
 import io.jessytsiriniaina.taskmanagerapi.enums.TaskPriority;
 import io.jessytsiriniaina.taskmanagerapi.enums.TaskStatus;
 import io.jessytsiriniaina.taskmanagerapi.exception.PaginationParamsInvalidException;
 import io.jessytsiriniaina.taskmanagerapi.exception.TaskNotFoundException;
+import io.jessytsiriniaina.taskmanagerapi.exception.UserNotFoundException;
 import io.jessytsiriniaina.taskmanagerapi.mapper.TaskMapper;
 import io.jessytsiriniaina.taskmanagerapi.repository.TaskRepository;
+import io.jessytsiriniaina.taskmanagerapi.repository.UserRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -20,10 +23,12 @@ import java.util.List;
 public class TaskService {
 
     private final TaskRepository taskRepository;
+    private final UserRepository userRepository;
     private final TaskMapper taskMapper;
 
-    public TaskService(TaskRepository taskRepository, TaskMapper taskMapper) {
+    public TaskService(TaskRepository taskRepository, UserRepository userRepository, TaskMapper taskMapper) {
         this.taskRepository = taskRepository;
+        this.userRepository = userRepository;
         this.taskMapper = taskMapper;
     }
 
@@ -35,8 +40,13 @@ public class TaskService {
     }
 
     public TaskResponse save(TaskRequest request) {
-        Task saved = taskRepository.save(taskMapper.toEntity(request));
-        return taskMapper.toResponse(saved);
+        User owner = userRepository.findById(request.userId())
+                .orElseThrow(() -> new UserNotFoundException(request.userId()));
+
+        Task task = taskMapper.toEntity(request);
+        task.setUser(owner);
+
+        return taskMapper.toResponse(taskRepository.save(task));
     }
 
     public TaskResponse findById(Long id) {

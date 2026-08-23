@@ -7,6 +7,7 @@ import java.time.LocalDateTime;
 
 public record TaskResponse(
         Long id,
+        Long userId,
         String title,
         String description,
         TaskStatus status,

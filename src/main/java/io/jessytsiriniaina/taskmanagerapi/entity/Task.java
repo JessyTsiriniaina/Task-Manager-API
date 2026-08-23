@@ -34,18 +34,23 @@ public class Task {
     @FutureOrPresent(message = "Task due date must be a future or the present date")
     private LocalDateTime dueDate;
 
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "user_id", nullable = false)
+    private User user;
+
     @Column(updatable = false)
     private LocalDateTime createdAt;
 
     private LocalDateTime updatedAt;
 
-    public Task(Long id, String title, String description, TaskStatus status, TaskPriority priority, LocalDateTime dueDate, LocalDateTime createdAt, LocalDateTime updatedAt) {
+    public Task(Long id, String title, String description, TaskStatus status, TaskPriority priority, LocalDateTime dueDate, User user, LocalDateTime createdAt, LocalDateTime updatedAt) {
         this.id = id;
         this.title = title;
         this.description = description;
         this.status = status;
         this.priority = priority;
         this.dueDate = dueDate;
+        this.user = user;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
     }
@@ -110,6 +115,14 @@ public class Task {
 
     public void setDueDate(LocalDateTime dueDate) {
         this.dueDate = dueDate;
+    }
+
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
     }
 
     public LocalDateTime getCreatedAt() {
