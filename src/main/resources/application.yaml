@@ -26,3 +26,7 @@ spring:
   web:
     resources:
       add-mappings: false
+
+jwt:
+  secret: ${JWT_SECRET}
+  expiration: ${JWT_EXPIRATION}
