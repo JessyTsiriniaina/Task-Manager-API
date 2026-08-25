@@ -1,6 +1,7 @@
 package io.jessytsiriniaina.taskmanagerapi.controller;
 
 import io.jessytsiriniaina.taskmanagerapi.dto.AuthResponse;
+import io.jessytsiriniaina.taskmanagerapi.dto.LoginRequest;
 import io.jessytsiriniaina.taskmanagerapi.dto.RegisterRequest;
 import io.jessytsiriniaina.taskmanagerapi.service.AuthService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -31,5 +32,14 @@ public class AuthController {
         return ResponseEntity
                 .status(HttpStatus.CREATED)
                 .body(response);
+    }
+
+    @Operation(summary = "Login with email and password")
+    @PostMapping("/login")
+    public ResponseEntity<AuthResponse> login(
+            @Valid @RequestBody LoginRequest request
+    ) {
+        AuthResponse response = authService.login(request);
+        return ResponseEntity.ok(response);
     }
 }
