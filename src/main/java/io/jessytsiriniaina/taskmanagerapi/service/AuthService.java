@@ -1,8 +1,15 @@
 package io.jessytsiriniaina.taskmanagerapi.service;
 
 import io.jessytsiriniaina.taskmanagerapi.dto.AuthResponse;
+<<<<<<< HEAD
 import io.jessytsiriniaina.taskmanagerapi.dto.RegisterRequest;
 import io.jessytsiriniaina.taskmanagerapi.entity.User;
+=======
+import io.jessytsiriniaina.taskmanagerapi.dto.LoginRequest;
+import io.jessytsiriniaina.taskmanagerapi.dto.RegisterRequest;
+import io.jessytsiriniaina.taskmanagerapi.entity.User;
+import io.jessytsiriniaina.taskmanagerapi.exception.InvalidCredentialsException;
+>>>>>>> feature/authentication
 import io.jessytsiriniaina.taskmanagerapi.exception.UserAlreadyExistsException;
 import io.jessytsiriniaina.taskmanagerapi.repository.UserRepository;
 import io.jessytsiriniaina.taskmanagerapi.security.JwtService;
@@ -42,4 +49,20 @@ public class AuthService {
 
         return new AuthResponse(token);
     }
+<<<<<<< HEAD
+=======
+
+    public AuthResponse login(LoginRequest request) {
+        User user = userRepository.findByEmail(request.email())
+                .orElseThrow(InvalidCredentialsException::new);
+
+        if (!passwordEncoder.matches(request.password(), user.getPassword())) {
+            throw new InvalidCredentialsException();
+        }
+
+        String token = jwtService.generateToken(user.getId());
+
+        return new AuthResponse(token);
+    }
+>>>>>>> feature/authentication
 }
