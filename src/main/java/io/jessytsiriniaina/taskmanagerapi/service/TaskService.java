@@ -8,13 +8,12 @@ import io.jessytsiriniaina.taskmanagerapi.enums.TaskPriority;
 import io.jessytsiriniaina.taskmanagerapi.enums.TaskStatus;
 import io.jessytsiriniaina.taskmanagerapi.exception.PaginationParamsInvalidException;
 import io.jessytsiriniaina.taskmanagerapi.exception.TaskNotFoundException;
-import io.jessytsiriniaina.taskmanagerapi.exception.UserNotFoundException;
 import io.jessytsiriniaina.taskmanagerapi.mapper.TaskMapper;
 import io.jessytsiriniaina.taskmanagerapi.repository.TaskRepository;
-import io.jessytsiriniaina.taskmanagerapi.repository.UserRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -23,44 +22,49 @@ import java.util.List;
 public class TaskService {
 
     private final TaskRepository taskRepository;
-    private final UserRepository userRepository;
     private final TaskMapper taskMapper;
 
-    public TaskService(TaskRepository taskRepository, UserRepository userRepository, TaskMapper taskMapper) {
+    public TaskService(TaskRepository taskRepository, TaskMapper taskMapper) {
         this.taskRepository = taskRepository;
-        this.userRepository = userRepository;
         this.taskMapper = taskMapper;
     }
 
     public List<TaskResponse> findAll() {
-        return taskRepository.findAll()
+        Long userId = getAuthenticatedUserId();
+        return taskRepository.findByUserId(userId)
                 .stream()
                 .map(taskMapper::toResponse)
                 .toList();
     }
 
     public TaskResponse save(TaskRequest request) {
-        User owner = userRepository.findById(request.userId())
-                .orElseThrow(() -> new UserNotFoundException(request.userId()));
+        Long userId = getAuthenticatedUserId();
+        User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
         Task task = taskMapper.toEntity(request);
-        task.setUser(owner);
+        task.setUser(user);
 
         return taskMapper.toResponse(taskRepository.save(task));
     }
 
     public TaskResponse findById(Long id) {
-        Task task = taskRepository.findById(id)
+        Long userId = getAuthenticatedUserId();
+        Task task = taskRepository.findByIdAndUserId(id, userId)
                 .orElseThrow(() -> new TaskNotFoundException(id));
         return taskMapper.toResponse(task);
     }
 
     public void deleteById(Long id) {
-        taskRepository.deleteById(id);
+        Long userId = getAuthenticatedUserId();
+        if (taskRepository.findByIdAndUserId(id, userId).isEmpty()) {
+            throw new TaskNotFoundException(id);
+        }
+        taskRepository.deleteByIdAndUserId(id, userId);
     }
 
     public TaskResponse update(Long id, TaskRequest request) {
-        return taskRepository.findById(id)
+        Long userId = getAuthenticatedUserId();
+        return taskRepository.findByIdAndUserId(id, userId)
                 .map(existingTask -> {
                     existingTask.setTitle(request.title());
                     existingTask.setDescription(request.description());
@@ -74,7 +78,8 @@ public class TaskService {
     }
 
     public TaskResponse updateStatus(Long id, TaskStatus status) {
-        return taskRepository.findById(id)
+        Long userId = getAuthenticatedUserId();
+        return taskRepository.findByIdAndUserId(id, userId)
                 .map(existingTask -> {
                     existingTask.setStatus(status);
                     return taskMapper.toResponse(taskRepository.save(existingTask));
@@ -83,41 +88,50 @@ public class TaskService {
     }
 
     public List<TaskResponse> findByStatus(TaskStatus status) {
-        return taskRepository.findByStatus(status)
+        Long userId = getAuthenticatedUserId();
+        return taskRepository.findByUserIdAndStatus(userId, status)
                 .stream()
                 .map(taskMapper::toResponse)
                 .toList();
     }
 
     public List<TaskResponse> findByPriority(TaskPriority priority) {
-        return taskRepository.findByPriority(priority)
+        Long userId = getAuthenticatedUserId();
+        return taskRepository.findByUserIdAndPriority(userId, priority)
                 .stream()
                 .map(taskMapper::toResponse)
                 .toList();
     }
 
     public List<TaskResponse> findByTitleContainingIgnoreCase(String text) {
-        return taskRepository.findByTitleContainingIgnoreCase(text)
+        Long userId = getAuthenticatedUserId();
+        return taskRepository.findByUserIdAndTitleContainingIgnoreCase(userId, text)
                 .stream()
                 .map(taskMapper::toResponse)
                 .toList();
     }
 
     public List<TaskResponse> findByStatusAndPriority(TaskStatus status, TaskPriority priority) {
-        return taskRepository.findByStatusAndPriority(status, priority)
+        Long userId = getAuthenticatedUserId();
+        return taskRepository.findByUserIdAndStatusAndPriority(userId, status, priority)
                 .stream()
                 .map(taskMapper::toResponse)
                 .toList();
     }
 
     public Page<TaskResponse> findAll(int page, int size) {
-        if(page< 0 || size < 1)
+        if (page < 0 || size < 1)
             throw new PaginationParamsInvalidException();
 
+        Long userId = getAuthenticatedUserId();
         Pageable pageable = PageRequest.of(page, size);
 
-        return taskRepository.findAll(pageable)
+        return taskRepository.findByUserId(userId, pageable)
                 .map(taskMapper::toResponse);
     }
 
+    private Long getAuthenticatedUserId() {
+        User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        return user.getId();
+    }
 }
