@@ -38,7 +38,6 @@ public class TaskService {
     }
 
     public TaskResponse save(TaskRequest request) {
-        Long userId = getAuthenticatedUserId();
         User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
         Task task = taskMapper.toEntity(request);

@@ -1,15 +1,10 @@
 package io.jessytsiriniaina.taskmanagerapi.service;
 
 import io.jessytsiriniaina.taskmanagerapi.dto.AuthResponse;
-<<<<<<< HEAD
-import io.jessytsiriniaina.taskmanagerapi.dto.RegisterRequest;
-import io.jessytsiriniaina.taskmanagerapi.entity.User;
-=======
 import io.jessytsiriniaina.taskmanagerapi.dto.LoginRequest;
 import io.jessytsiriniaina.taskmanagerapi.dto.RegisterRequest;
 import io.jessytsiriniaina.taskmanagerapi.entity.User;
 import io.jessytsiriniaina.taskmanagerapi.exception.InvalidCredentialsException;
->>>>>>> feature/authentication
 import io.jessytsiriniaina.taskmanagerapi.exception.UserAlreadyExistsException;
 import io.jessytsiriniaina.taskmanagerapi.repository.UserRepository;
 import io.jessytsiriniaina.taskmanagerapi.security.JwtService;
@@ -22,11 +17,15 @@ public class AuthService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
+    private final BlockedTokenService blockedTokenService;
+    private final RefreshTokenService refreshTokenService;
 
-    public AuthService(UserRepository userRepository, PasswordEncoder passwordEncoder, JwtService jwtService) {
+    public AuthService(UserRepository userRepository, PasswordEncoder passwordEncoder, JwtService jwtService, BlockedTokenService blockedTokenService, RefreshTokenService refreshTokenService) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.jwtService = jwtService;
+        this.blockedTokenService = blockedTokenService;
+        this.refreshTokenService = refreshTokenService;
     }
 
     public AuthResponse register(RegisterRequest request) {
@@ -45,12 +44,8 @@ public class AuthService {
 
         userRepository.save(user);
 
-        String token = jwtService.generateToken(user.getId());
-
-        return new AuthResponse(token);
+        return buildAuthResponse(user);
     }
-<<<<<<< HEAD
-=======
 
     public AuthResponse login(LoginRequest request) {
         User user = userRepository.findByEmail(request.email())
@@ -60,9 +55,26 @@ public class AuthService {
             throw new InvalidCredentialsException();
         }
 
-        String token = jwtService.generateToken(user.getId());
-
-        return new AuthResponse(token);
+        return buildAuthResponse(user);
     }
->>>>>>> feature/authentication
+
+    public AuthResponse refresh(String refreshToken) {
+        RefreshTokenService.Grant grant = refreshTokenService.validateAndRotate(refreshToken);
+        return new AuthResponse(
+                jwtService.generateToken(grant.user().getId()),
+                grant.refreshToken()
+        );
+    }
+
+    public void logout(String token) {
+        Long userId = jwtService.extractUserId(token);
+        blockedTokenService.block(token);
+        refreshTokenService.revokeAllForUser(userId);
+    }
+
+    private AuthResponse buildAuthResponse(User user) {
+        String accessToken = jwtService.generateToken(user.getId());
+        String refreshToken = refreshTokenService.issue(user);
+        return new AuthResponse(accessToken, refreshToken);
+    }
 }
