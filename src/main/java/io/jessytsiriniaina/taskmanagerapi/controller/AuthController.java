@@ -2,6 +2,7 @@ package io.jessytsiriniaina.taskmanagerapi.controller;
 
 import io.jessytsiriniaina.taskmanagerapi.dto.AuthResponse;
 import io.jessytsiriniaina.taskmanagerapi.dto.LoginRequest;
+import io.jessytsiriniaina.taskmanagerapi.dto.RefreshRequest;
 import io.jessytsiriniaina.taskmanagerapi.dto.RegisterRequest;
 import io.jessytsiriniaina.taskmanagerapi.service.AuthService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -41,6 +42,15 @@ public class AuthController {
             @Valid @RequestBody LoginRequest request
     ) {
         AuthResponse response = authService.login(request);
+        return ResponseEntity.ok(response);
+    }
+
+    @Operation(summary = "Exchange a refresh token for a new token pair")
+    @PostMapping("/refresh")
+    public ResponseEntity<AuthResponse> refresh(
+            @Valid @RequestBody RefreshRequest request
+    ) {
+        AuthResponse response = authService.refresh(request.refreshToken());
         return ResponseEntity.ok(response);
     }
 

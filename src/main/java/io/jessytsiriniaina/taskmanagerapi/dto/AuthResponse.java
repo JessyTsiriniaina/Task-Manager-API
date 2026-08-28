@@ -1,4 +1,4 @@
 package io.jessytsiriniaina.taskmanagerapi.dto;
 
-public record AuthResponse(String token) {
+public record AuthResponse(String accessToken, String refreshToken) {
 }

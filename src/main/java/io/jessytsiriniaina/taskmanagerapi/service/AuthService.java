@@ -18,12 +18,14 @@ public class AuthService {
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
     private final BlockedTokenService blockedTokenService;
+    private final RefreshTokenService refreshTokenService;
 
-    public AuthService(UserRepository userRepository, PasswordEncoder passwordEncoder, JwtService jwtService, BlockedTokenService blockedTokenService) {
+    public AuthService(UserRepository userRepository, PasswordEncoder passwordEncoder, JwtService jwtService, BlockedTokenService blockedTokenService, RefreshTokenService refreshTokenService) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.jwtService = jwtService;
         this.blockedTokenService = blockedTokenService;
+        this.refreshTokenService = refreshTokenService;
     }
 
     public AuthResponse register(RegisterRequest request) {
@@ -42,9 +44,7 @@ public class AuthService {
 
         userRepository.save(user);
 
-        String token = jwtService.generateToken(user.getId());
-
-        return new AuthResponse(token);
+        return buildAuthResponse(user);
     }
 
     public AuthResponse login(LoginRequest request) {
@@ -55,12 +55,26 @@ public class AuthService {
             throw new InvalidCredentialsException();
         }
 
-        String token = jwtService.generateToken(user.getId());
+        return buildAuthResponse(user);
+    }
 
-        return new AuthResponse(token);
+    public AuthResponse refresh(String refreshToken) {
+        RefreshTokenService.Grant grant = refreshTokenService.validateAndRotate(refreshToken);
+        return new AuthResponse(
+                jwtService.generateToken(grant.user().getId()),
+                grant.refreshToken()
+        );
     }
 
     public void logout(String token) {
+        Long userId = jwtService.extractUserId(token);
         blockedTokenService.block(token);
+        refreshTokenService.revokeAllForUser(userId);
+    }
+
+    private AuthResponse buildAuthResponse(User user) {
+        String accessToken = jwtService.generateToken(user.getId());
+        String refreshToken = refreshTokenService.issue(user);
+        return new AuthResponse(accessToken, refreshToken);
     }
 }
