@@ -1,13 +1,11 @@
 package io.jessytsiriniaina.taskmanagerapi.controller;
 
 import io.jessytsiriniaina.taskmanagerapi.dto.AuthResponse;
-<<<<<<< HEAD
-=======
 import io.jessytsiriniaina.taskmanagerapi.dto.LoginRequest;
->>>>>>> feature/authentication
 import io.jessytsiriniaina.taskmanagerapi.dto.RegisterRequest;
 import io.jessytsiriniaina.taskmanagerapi.service.AuthService;
 import io.swagger.v3.oas.annotations.Operation;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -36,8 +34,6 @@ public class AuthController {
                 .status(HttpStatus.CREATED)
                 .body(response);
     }
-<<<<<<< HEAD
-=======
 
     @Operation(summary = "Login with email and password")
     @PostMapping("/login")
@@ -47,5 +43,12 @@ public class AuthController {
         AuthResponse response = authService.login(request);
         return ResponseEntity.ok(response);
     }
->>>>>>> feature/authentication
+
+    @Operation(summary = "Logout and revoke the current token")
+    @PostMapping("/logout")
+    public ResponseEntity<Void> logout(HttpServletRequest request) {
+        String token = request.getHeader("Authorization").substring(7);
+        authService.logout(token);
+        return ResponseEntity.noContent().build();
+    }
 }

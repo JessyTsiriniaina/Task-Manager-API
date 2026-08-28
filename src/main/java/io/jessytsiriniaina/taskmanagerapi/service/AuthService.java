@@ -1,15 +1,10 @@
 package io.jessytsiriniaina.taskmanagerapi.service;
 
 import io.jessytsiriniaina.taskmanagerapi.dto.AuthResponse;
-<<<<<<< HEAD
-import io.jessytsiriniaina.taskmanagerapi.dto.RegisterRequest;
-import io.jessytsiriniaina.taskmanagerapi.entity.User;
-=======
 import io.jessytsiriniaina.taskmanagerapi.dto.LoginRequest;
 import io.jessytsiriniaina.taskmanagerapi.dto.RegisterRequest;
 import io.jessytsiriniaina.taskmanagerapi.entity.User;
 import io.jessytsiriniaina.taskmanagerapi.exception.InvalidCredentialsException;
->>>>>>> feature/authentication
 import io.jessytsiriniaina.taskmanagerapi.exception.UserAlreadyExistsException;
 import io.jessytsiriniaina.taskmanagerapi.repository.UserRepository;
 import io.jessytsiriniaina.taskmanagerapi.security.JwtService;
@@ -22,11 +17,13 @@ public class AuthService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
+    private final BlockedTokenService blockedTokenService;
 
-    public AuthService(UserRepository userRepository, PasswordEncoder passwordEncoder, JwtService jwtService) {
+    public AuthService(UserRepository userRepository, PasswordEncoder passwordEncoder, JwtService jwtService, BlockedTokenService blockedTokenService) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.jwtService = jwtService;
+        this.blockedTokenService = blockedTokenService;
     }
 
     public AuthResponse register(RegisterRequest request) {
@@ -49,8 +46,6 @@ public class AuthService {
 
         return new AuthResponse(token);
     }
-<<<<<<< HEAD
-=======
 
     public AuthResponse login(LoginRequest request) {
         User user = userRepository.findByEmail(request.email())
@@ -64,5 +59,8 @@ public class AuthService {
 
         return new AuthResponse(token);
     }
->>>>>>> feature/authentication
+
+    public void logout(String token) {
+        blockedTokenService.block(token);
+    }
 }
