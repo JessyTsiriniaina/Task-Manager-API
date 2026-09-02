@@ -8,11 +8,14 @@ import io.jessytsiriniaina.taskmanagerapi.exception.InvalidCredentialsException;
 import io.jessytsiriniaina.taskmanagerapi.exception.UserAlreadyExistsException;
 import io.jessytsiriniaina.taskmanagerapi.repository.UserRepository;
 import io.jessytsiriniaina.taskmanagerapi.security.JwtService;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 @Service
-public class AuthService {
+public class AuthService implements UserDetailsService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
@@ -76,5 +79,16 @@ public class AuthService {
         String accessToken = jwtService.generateToken(user.getId());
         String refreshToken = refreshTokenService.issue(user);
         return new AuthResponse(accessToken, refreshToken);
+    }
+
+    @Override
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new UsernameNotFoundException("Utilisateur non trouvé : " + username));
+
+        return org.springframework.security.core.userdetails.User.builder()
+                .username(user.getUsername())
+                .password(user.getPassword())
+                .build();
     }
 }
