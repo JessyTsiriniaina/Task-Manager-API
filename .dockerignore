@@ -1,0 +1,28 @@
+# Build
+target/
+*.jar
+*.war
+
+# VCS
+.git/
+.gitignore
+.gitattributes
+
+# Environment / secrets
+.env
+.env.*
+!.env.example
+
+# IDE
+.idea/
+*.iml
+.vscode/
+
+# Logs
+*.log
+
+# Maven wrapper script for Windows (not needed at runtime)
+mvnw.cmd
+
+# OS
+.DS_Store

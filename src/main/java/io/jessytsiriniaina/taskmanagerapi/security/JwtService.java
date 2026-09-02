@@ -7,6 +7,7 @@ import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import jakarta.annotation.PostConstruct;
 import javax.crypto.SecretKey;
 import java.util.Date;
 import java.util.UUID;
@@ -19,6 +20,20 @@ public class JwtService {
 
     @Value("${jwt.expiration}")
     private long expiration;
+
+    @PostConstruct
+    void validateConfiguration() {
+        if (secret == null || secret.isBlank()) {
+            throw new IllegalStateException("JWT secret is not configured. Set the JWT_SECRET environment variable.");
+        }
+        try {
+            getSigningKey();
+        } catch (RuntimeException e) {
+            throw new IllegalStateException(
+                    "JWT secret is invalid: it must be a base64-encoded key of at least 256 bits (32 bytes).",
+                    e);
+        }
+    }
 
     public String generateToken(Long userId) {
         return Jwts.builder()
