@@ -3,17 +3,21 @@ spring:
     import:
 
   datasource:
-    url: jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1
+    url: jdbc:h2:mem:testdb;MODE=PostgreSQL;DB_CLOSE_DELAY=-1;DATABASE_TO_LOWER=TRUE;DEFAULT_NULL_ORDERING=HIGH
     driver-class-name: org.h2.Driver
     username: sa
     password:
 
   jpa:
     hibernate:
-      ddl-auto: create-drop
+      ddl-auto: validate
     show-sql: false
+    open-in-view: false
+
+  flyway:
+    enabled: true
 
 jwt:
-  secret: test-secret-key-for-junit-tests-256-bit-min-length
+  secret: dGVzdC1zZWNyZXQta2V5LWZvci1qd3QtdGVzdHMtMDEyMzQ1Njc4OWFiY2RlZg==
   expiration: 3600000
   refresh-expiration: 604800000
