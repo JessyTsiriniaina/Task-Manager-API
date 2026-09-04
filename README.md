@@ -41,26 +41,6 @@ Users can register, authenticate with email/password, and manage their own tasks
 
 ---
 
-## Architecture
-
-```
-HTTP Request
-      │
-      ▼
-┌──────────────┐   ┌──────────────┐   ┌──────────────┐
-│  Controller  │──▶│    Service   │──▶│  Repository  │
-│    (DTO)     │   │  (business)  │   │    (JPA)     │
-└──────┬───────┘   └──────────────┘   └──────┬───────┘
-       │                                     │
-       │  ✔ Security (JWT filter)            │
-       │  ✔ Validation (Bean Validation)     │
-       │  ✔ Errors (GlobalExceptionHandler)  │
-       │                                     ▼
-       │                              ┌──────────────┐
-       └─────────────────────────────▶│  PostgreSQL  │
-                                      └──────────────┘
-```
-
 Layered packages under `io.jessytsiriniaina.taskmanagerapi`:
 
 ```
